@@ -1,0 +1,93 @@
+version: "3.9"
+
+# Credentials are generated automatically by start.sh on first run.
+# Values are read from the .env file (gitignored).
+
+services:
+  api:
+    image: ghcr.io/YOUR_ORG/tome:latest
+    # Uncomment the line below (and comment out image:) for local development:
+    # build: ./api
+    restart: unless-stopped
+    ports:
+      - "8420:3000"
+    networks:
+      - frontend
+      - backend
+    environment:
+      # ── Database ───────────────────────────────────────────────────────────
+      - DATABASE_URL=postgresql://logger:${DB_PASSWORD}@db:5432/logs
+
+      # ── SMTP ──────────────────────────────────────────────────────────────
+      # SendGrid: SMTP_HOST=smtp.sendgrid.net, SMTP_USER=apikey, SMTP_PASSWORD=SG.xxx
+      - SMTP_HOST=smtp.sendgrid.net
+      - SMTP_PORT=587
+      - SMTP_USER=apikey
+      - SMTP_PASSWORD=CHANGE_ME_SMTP_PASSWORD
+      - SMTP_FROM=logs@yourdomain.com
+      - SMTP_STARTTLS=true
+
+      # ── Ingest ────────────────────────────────────────────────────────────
+      # Comma-separated list of accepted log levels (case-insensitive).
+      # Records submitted with any other level are rejected with HTTP 400.
+      # Add 'critical' for Python or 'panic' for Go if needed.
+      - TOME_LOG_LEVELS=trace,debug,info,warn,error,fatal
+
+      - NODE_ENV=production
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    networks:
+      - backend
+    environment:
+      - POSTGRES_USER=logger
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=logs
+      - ADMIN_KEY_HASH=${ADMIN_KEY_HASH}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./postgres/seed.sh:/docker-entrypoint-initdb.d/02-seed.sh
+    command: >
+      postgres
+        -c shared_buffers=256MB
+        -c work_mem=8MB
+        -c maintenance_work_mem=64MB
+        -c max_connections=50
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U logger -d logs"]
+      interval: 5s
+      retries: 5
+
+  backup:
+    image: postgres:16-alpine
+    restart: "no"
+    profiles: ["backup"]
+    networks:
+      - backend
+    environment:
+      - PGPASSWORD=${DB_PASSWORD}
+    volumes:
+      - ./backups:/backups
+    entrypoint: >
+      sh -c "pg_dump -h db -U logger -d logs -Fc -f /backups/tome-$(date +%Y%m%d-%H%M%S).dump"
+    depends_on:
+      - db
+
+networks:
+  frontend:   # api ↔ host (port 8420)
+  backend:    # api ↔ db only; db is not reachable from the host network

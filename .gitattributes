@@ -1,0 +1,16 @@
+# Force LF line endings for shell scripts regardless of platform
+*.sh    text eol=lf
+
+# Standard text files
+*.ts    text eol=lf
+*.js    text eol=lf
+*.json  text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.sql   text eol=lf
+*.md    text eol=lf
+
+# Binaries
+*.dump  binary
+*.png   binary
+*.jpg   binary

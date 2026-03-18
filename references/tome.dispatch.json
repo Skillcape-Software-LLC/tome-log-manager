@@ -1,0 +1,576 @@
+{
+  "version": 1,
+  "type": "dispatch-collection",
+  "exportedAt": "2026-03-18T20:00:00.000Z",
+  "collection": {
+    "id": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Tome",
+    "description": "Tome Log Management API — full endpoint collection",
+    "folders": [
+      {
+        "id": "f0000001-0000-0000-0000-000000000001",
+        "name": "Health",
+        "sortOrder": 0
+      },
+      {
+        "id": "f0000001-0000-0000-0000-000000000002",
+        "name": "Ingest",
+        "sortOrder": 1
+      },
+      {
+        "id": "f0000001-0000-0000-0000-000000000003",
+        "name": "Query",
+        "sortOrder": 2
+      },
+      {
+        "id": "f0000001-0000-0000-0000-000000000004",
+        "name": "Keys",
+        "sortOrder": 3
+      },
+      {
+        "id": "f0000001-0000-0000-0000-000000000005",
+        "name": "Alerts",
+        "sortOrder": 4
+      },
+      {
+        "id": "f0000001-0000-0000-0000-000000000006",
+        "name": "Admin",
+        "sortOrder": 5
+      }
+    ],
+    "auth": {
+      "type": "apikey",
+      "apikey": {
+        "key": "X-API-Key",
+        "value": "localdevkey",
+        "in": "header"
+      }
+    },
+    "variables": [],
+    "createdAt": "2026-03-18T20:00:00.000Z",
+    "updatedAt": "2026-03-18T20:00:00.000Z",
+    "requests": [
+      {
+        "id": "a0000001-0000-0000-0000-000000000001",
+        "collectionId": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "folderId": "f0000001-0000-0000-0000-000000000001",
+        "sortOrder": 0,
+        "createdAt": "2026-03-18T20:00:00.000Z",
+        "updatedAt": "2026-03-18T20:00:00.000Z",
+        "name": "Health Check",
+        "method": "GET",
+        "url": "http://localhost:3000/healthz",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "content": ""
+        },
+        "auth": {
+          "type": "none",
+          "bearer": { "token": "" },
+          "basic": { "username": "", "password": "" },
+          "apikey": { "key": "", "value": "", "in": "header" }
+        }
+      },
+      {
+        "id": "a0000002-0000-0000-0000-000000000001",
+        "collectionId": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "folderId": "f0000001-0000-0000-0000-000000000002",
+        "sortOrder": 0,
+        "createdAt": "2026-03-18T20:00:00.000Z",
+        "updatedAt": "2026-03-18T20:00:00.000Z",
+        "name": "Ingest Single Record",
+        "method": "POST",
+        "url": "http://localhost:3000/records",
+        "headers": [
+          {
+            "id": "h0000001-0000-0000-0000-000000000001",
+            "key": "Content-Type",
+            "value": "application/json",
+            "enabled": true
+          }
+        ],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "content": "{\n  \"level\": \"error\",\n  \"collection\": \"my-app\",\n  \"message\": \"Database connection failed\",\n  \"metadata\": {\n    \"host\": \"db01\",\n    \"port\": 5432,\n    \"error_code\": \"ECONNREFUSED\"\n  }\n}"
+        },
+        "auth": {
+          "type": "inherit",
+          "bearer": { "token": "" },
+          "basic": { "username": "", "password": "" },
+          "apikey": { "key": "", "value": "", "in": "header" }
+        }
+      },
+      {
+        "id": "a0000002-0000-0000-0000-000000000002",
+        "collectionId": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "folderId": "f0000001-0000-0000-0000-000000000002",
+        "sortOrder": 1,
+        "createdAt": "2026-03-18T20:00:00.000Z",
+        "updatedAt": "2026-03-18T20:00:00.000Z",
+        "name": "Ingest Batch",
+        "method": "POST",
+        "url": "http://localhost:3000/records/batch",
+        "headers": [
+          {
+            "id": "h0000002-0000-0000-0000-000000000001",
+            "key": "Content-Type",
+            "value": "application/json",
+            "enabled": true
+          }
+        ],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "content": "[\n  {\n    \"level\": \"info\",\n    \"collection\": \"my-app\",\n    \"message\": \"User logged in\",\n    \"metadata\": { \"user_id\": \"u_001\" }\n  },\n  {\n    \"level\": \"warn\",\n    \"collection\": \"my-app\",\n    \"message\": \"Rate limit approaching\",\n    \"metadata\": { \"user_id\": \"u_001\", \"current_rate\": 95 }\n  },\n  {\n    \"level\": \"error\",\n    \"collection\": \"my-app\",\n    \"message\": \"Payment processing failed\",\n    \"metadata\": { \"user_id\": \"u_001\", \"error_code\": \"TIMEOUT\" }\n  }\n]"
+        },
+        "auth": {
+          "type": "inherit",
+          "bearer": { "token": "" },
+          "basic": { "username": "", "password": "" },
+          "apikey": { "key": "", "value": "", "in": "header" }
+        }
+      },
+      {
+        "id": "a0000003-0000-0000-0000-000000000001",
+        "collectionId": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "folderId": "f0000001-0000-0000-0000-000000000003",
+        "sortOrder": 0,
+        "createdAt": "2026-03-18T20:00:00.000Z",
+        "updatedAt": "2026-03-18T20:00:00.000Z",
+        "name": "Query Records",
+        "method": "GET",
+        "url": "http://localhost:3000/records",
+        "headers": [],
+        "params": [
+          { "id": "p0000001-0001", "key": "collection", "value": "my-app", "enabled": true },
+          { "id": "p0000001-0002", "key": "level", "value": "error,fatal", "enabled": false },
+          { "id": "p0000001-0003", "key": "q", "value": "connection failed", "enabled": false },
+          { "id": "p0000001-0004", "key": "message_contains", "value": "ECONNREFUSED", "enabled": false },
+          { "id": "p0000001-0005", "key": "from", "value": "2026-03-01T00:00:00Z", "enabled": false },
+          { "id": "p0000001-0006", "key": "to", "value": "2026-03-31T23:59:59Z", "enabled": false },
+          { "id": "p0000001-0007", "key": "received_from", "value": "2026-03-18T00:00:00Z", "enabled": false },
+          { "id": "p0000001-0008", "key": "received_to", "value": "2026-03-18T23:59:59Z", "enabled": false },
+          { "id": "p0000001-0009", "key": "metadata.error_code", "value": "ECONNREFUSED", "enabled": false },
+          { "id": "p0000001-0010", "key": "limit", "value": "50", "enabled": false },
+          { "id": "p0000001-0011", "key": "order", "value": "desc", "enabled": false }
+        ],
+        "body": {
+          "mode": "none",
+          "content": ""
+        },
+        "auth": {
+          "type": "inherit",
+          "bearer": { "token": "" },
+          "basic": { "username": "", "password": "" },
+          "apikey": { "key": "", "value": "", "in": "header" }
+        }
+      },
+      {
+        "id": "a0000003-0000-0000-0000-000000000002",
+        "collectionId": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "folderId": "f0000001-0000-0000-0000-000000000003",
+        "sortOrder": 1,
+        "createdAt": "2026-03-18T20:00:00.000Z",
+        "updatedAt": "2026-03-18T20:00:00.000Z",
+        "name": "Get Record by ID",
+        "method": "GET",
+        "url": "http://localhost:3000/records/REPLACE_WITH_RECORD_UUID",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "content": ""
+        },
+        "auth": {
+          "type": "inherit",
+          "bearer": { "token": "" },
+          "basic": { "username": "", "password": "" },
+          "apikey": { "key": "", "value": "", "in": "header" }
+        }
+      },
+      {
+        "id": "a0000003-0000-0000-0000-000000000003",
+        "collectionId": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "folderId": "f0000001-0000-0000-0000-000000000003",
+        "sortOrder": 2,
+        "createdAt": "2026-03-18T20:00:00.000Z",
+        "updatedAt": "2026-03-18T20:00:00.000Z",
+        "name": "Export Records (NDJSON)",
+        "method": "GET",
+        "url": "http://localhost:3000/records/export",
+        "headers": [],
+        "params": [
+          { "id": "p0000003-0001", "key": "collection", "value": "my-app", "enabled": true },
+          { "id": "p0000003-0002", "key": "level", "value": "error", "enabled": false },
+          { "id": "p0000003-0003", "key": "from", "value": "2026-03-01T00:00:00Z", "enabled": false },
+          { "id": "p0000003-0004", "key": "message_contains", "value": "failed", "enabled": false },
+          { "id": "p0000003-0005", "key": "metadata.error_code", "value": "TIMEOUT", "enabled": false },
+          { "id": "p0000003-0006", "key": "order", "value": "asc", "enabled": false }
+        ],
+        "body": {
+          "mode": "none",
+          "content": ""
+        },
+        "auth": {
+          "type": "inherit",
+          "bearer": { "token": "" },
+          "basic": { "username": "", "password": "" },
+          "apikey": { "key": "", "value": "", "in": "header" }
+        }
+      },
+      {
+        "id": "a0000003-0000-0000-0000-000000000004",
+        "collectionId": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "folderId": "f0000001-0000-0000-0000-000000000003",
+        "sortOrder": 3,
+        "createdAt": "2026-03-18T20:00:00.000Z",
+        "updatedAt": "2026-03-18T20:00:00.000Z",
+        "name": "List Collections",
+        "method": "GET",
+        "url": "http://localhost:3000/collections",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "content": ""
+        },
+        "auth": {
+          "type": "inherit",
+          "bearer": { "token": "" },
+          "basic": { "username": "", "password": "" },
+          "apikey": { "key": "", "value": "", "in": "header" }
+        }
+      },
+      {
+        "id": "a0000003-0000-0000-0000-000000000005",
+        "collectionId": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "folderId": "f0000001-0000-0000-0000-000000000003",
+        "sortOrder": 4,
+        "createdAt": "2026-03-18T20:00:00.000Z",
+        "updatedAt": "2026-03-18T20:00:00.000Z",
+        "name": "Stats",
+        "method": "GET",
+        "url": "http://localhost:3000/stats",
+        "headers": [],
+        "params": [
+          { "id": "p0000005-0001", "key": "from", "value": "2026-03-01T00:00:00Z", "enabled": false },
+          { "id": "p0000005-0002", "key": "to", "value": "2026-03-31T23:59:59Z", "enabled": false }
+        ],
+        "body": {
+          "mode": "none",
+          "content": ""
+        },
+        "auth": {
+          "type": "inherit",
+          "bearer": { "token": "" },
+          "basic": { "username": "", "password": "" },
+          "apikey": { "key": "", "value": "", "in": "header" }
+        }
+      },
+      {
+        "id": "a0000004-0000-0000-0000-000000000001",
+        "collectionId": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "folderId": "f0000001-0000-0000-0000-000000000004",
+        "sortOrder": 0,
+        "createdAt": "2026-03-18T20:00:00.000Z",
+        "updatedAt": "2026-03-18T20:00:00.000Z",
+        "name": "Create Key",
+        "method": "POST",
+        "url": "http://localhost:3000/keys",
+        "headers": [
+          {
+            "id": "h0000004-0000-0000-0000-000000000001",
+            "key": "Content-Type",
+            "value": "application/json",
+            "enabled": true
+          }
+        ],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "content": "{\n  \"name\": \"my-app-ingest\",\n  \"role\": \"ingest\",\n  \"collection\": \"my-app\",\n  \"project_name\": \"my-project\"\n}"
+        },
+        "auth": {
+          "type": "inherit",
+          "bearer": { "token": "" },
+          "basic": { "username": "", "password": "" },
+          "apikey": { "key": "", "value": "", "in": "header" }
+        }
+      },
+      {
+        "id": "a0000004-0000-0000-0000-000000000002",
+        "collectionId": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "folderId": "f0000001-0000-0000-0000-000000000004",
+        "sortOrder": 1,
+        "createdAt": "2026-03-18T20:00:00.000Z",
+        "updatedAt": "2026-03-18T20:00:00.000Z",
+        "name": "List Keys",
+        "method": "GET",
+        "url": "http://localhost:3000/keys",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "content": ""
+        },
+        "auth": {
+          "type": "inherit",
+          "bearer": { "token": "" },
+          "basic": { "username": "", "password": "" },
+          "apikey": { "key": "", "value": "", "in": "header" }
+        }
+      },
+      {
+        "id": "a0000004-0000-0000-0000-000000000003",
+        "collectionId": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "folderId": "f0000001-0000-0000-0000-000000000004",
+        "sortOrder": 2,
+        "createdAt": "2026-03-18T20:00:00.000Z",
+        "updatedAt": "2026-03-18T20:00:00.000Z",
+        "name": "Revoke Key",
+        "method": "DELETE",
+        "url": "http://localhost:3000/keys/REPLACE_WITH_KEY_UUID",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "content": ""
+        },
+        "auth": {
+          "type": "inherit",
+          "bearer": { "token": "" },
+          "basic": { "username": "", "password": "" },
+          "apikey": { "key": "", "value": "", "in": "header" }
+        }
+      },
+      {
+        "id": "a0000005-0000-0000-0000-000000000001",
+        "collectionId": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "folderId": "f0000001-0000-0000-0000-000000000005",
+        "sortOrder": 0,
+        "createdAt": "2026-03-18T20:00:00.000Z",
+        "updatedAt": "2026-03-18T20:00:00.000Z",
+        "name": "Create Alert Rule",
+        "method": "POST",
+        "url": "http://localhost:3000/alerts",
+        "headers": [
+          {
+            "id": "h0000005-0000-0000-0000-000000000001",
+            "key": "Content-Type",
+            "value": "application/json",
+            "enabled": true
+          }
+        ],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "content": "{\n  \"name\": \"Critical errors in payments\",\n  \"enabled\": true,\n  \"match_collections\": [\"payments\"],\n  \"match_levels\": [\"error\", \"fatal\"],\n  \"match_message\": null,\n  \"match_metadata\": null,\n  \"action_type\": \"email\",\n  \"action_config\": {\n    \"to\": [\"oncall@example.com\"],\n    \"subject_template\": \"[Tome] {level} in {collection}\",\n    \"body_template\": \"Rule: {rule_name}\\nLevel: {level}\\nCollection: {collection}\\nMessage: {message}\\nTimestamp: {timestamp}\\nRecord ID: {record_id}\\n\\nMetadata:\\n{metadata}\"\n  },\n  \"cooldown_seconds\": 300\n}"
+        },
+        "auth": {
+          "type": "inherit",
+          "bearer": { "token": "" },
+          "basic": { "username": "", "password": "" },
+          "apikey": { "key": "", "value": "", "in": "header" }
+        }
+      },
+      {
+        "id": "a0000005-0000-0000-0000-000000000002",
+        "collectionId": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "folderId": "f0000001-0000-0000-0000-000000000005",
+        "sortOrder": 1,
+        "createdAt": "2026-03-18T20:00:00.000Z",
+        "updatedAt": "2026-03-18T20:00:00.000Z",
+        "name": "List Alert Rules",
+        "method": "GET",
+        "url": "http://localhost:3000/alerts",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "content": ""
+        },
+        "auth": {
+          "type": "inherit",
+          "bearer": { "token": "" },
+          "basic": { "username": "", "password": "" },
+          "apikey": { "key": "", "value": "", "in": "header" }
+        }
+      },
+      {
+        "id": "a0000005-0000-0000-0000-000000000003",
+        "collectionId": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "folderId": "f0000001-0000-0000-0000-000000000005",
+        "sortOrder": 2,
+        "createdAt": "2026-03-18T20:00:00.000Z",
+        "updatedAt": "2026-03-18T20:00:00.000Z",
+        "name": "Get Alert Rule",
+        "method": "GET",
+        "url": "http://localhost:3000/alerts/REPLACE_WITH_RULE_UUID",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "content": ""
+        },
+        "auth": {
+          "type": "inherit",
+          "bearer": { "token": "" },
+          "basic": { "username": "", "password": "" },
+          "apikey": { "key": "", "value": "", "in": "header" }
+        }
+      },
+      {
+        "id": "a0000005-0000-0000-0000-000000000004",
+        "collectionId": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "folderId": "f0000001-0000-0000-0000-000000000005",
+        "sortOrder": 3,
+        "createdAt": "2026-03-18T20:00:00.000Z",
+        "updatedAt": "2026-03-18T20:00:00.000Z",
+        "name": "Update Alert Rule",
+        "method": "PATCH",
+        "url": "http://localhost:3000/alerts/REPLACE_WITH_RULE_UUID",
+        "headers": [
+          {
+            "id": "h0000005-0000-0000-0000-000000000004",
+            "key": "Content-Type",
+            "value": "application/json",
+            "enabled": true
+          }
+        ],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "content": "{\n  \"enabled\": false,\n  \"cooldown_seconds\": 600\n}"
+        },
+        "auth": {
+          "type": "inherit",
+          "bearer": { "token": "" },
+          "basic": { "username": "", "password": "" },
+          "apikey": { "key": "", "value": "", "in": "header" }
+        }
+      },
+      {
+        "id": "a0000005-0000-0000-0000-000000000005",
+        "collectionId": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "folderId": "f0000001-0000-0000-0000-000000000005",
+        "sortOrder": 4,
+        "createdAt": "2026-03-18T20:00:00.000Z",
+        "updatedAt": "2026-03-18T20:00:00.000Z",
+        "name": "Delete Alert Rule",
+        "method": "DELETE",
+        "url": "http://localhost:3000/alerts/REPLACE_WITH_RULE_UUID",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "content": ""
+        },
+        "auth": {
+          "type": "inherit",
+          "bearer": { "token": "" },
+          "basic": { "username": "", "password": "" },
+          "apikey": { "key": "", "value": "", "in": "header" }
+        }
+      },
+      {
+        "id": "a0000005-0000-0000-0000-000000000006",
+        "collectionId": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "folderId": "f0000001-0000-0000-0000-000000000005",
+        "sortOrder": 5,
+        "createdAt": "2026-03-18T20:00:00.000Z",
+        "updatedAt": "2026-03-18T20:00:00.000Z",
+        "name": "Alert History",
+        "method": "GET",
+        "url": "http://localhost:3000/alerts/REPLACE_WITH_RULE_UUID/history",
+        "headers": [],
+        "params": [
+          { "id": "p0000005-0006-0001", "key": "limit", "value": "50", "enabled": false }
+        ],
+        "body": {
+          "mode": "none",
+          "content": ""
+        },
+        "auth": {
+          "type": "inherit",
+          "bearer": { "token": "" },
+          "basic": { "username": "", "password": "" },
+          "apikey": { "key": "", "value": "", "in": "header" }
+        }
+      },
+      {
+        "id": "a0000005-0000-0000-0000-000000000007",
+        "collectionId": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "folderId": "f0000001-0000-0000-0000-000000000005",
+        "sortOrder": 6,
+        "createdAt": "2026-03-18T20:00:00.000Z",
+        "updatedAt": "2026-03-18T20:00:00.000Z",
+        "name": "Test Alert Rule",
+        "method": "POST",
+        "url": "http://localhost:3000/alerts/REPLACE_WITH_RULE_UUID/test",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "content": ""
+        },
+        "auth": {
+          "type": "inherit",
+          "bearer": { "token": "" },
+          "basic": { "username": "", "password": "" },
+          "apikey": { "key": "", "value": "", "in": "header" }
+        }
+      },
+      {
+        "id": "a0000006-0000-0000-0000-000000000001",
+        "collectionId": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "folderId": "f0000001-0000-0000-0000-000000000006",
+        "sortOrder": 0,
+        "createdAt": "2026-03-18T20:00:00.000Z",
+        "updatedAt": "2026-03-18T20:00:00.000Z",
+        "name": "Dashboard",
+        "method": "GET",
+        "url": "http://localhost:3000/dashboard",
+        "headers": [],
+        "params": [
+          { "id": "p0000006-0001", "key": "window_hours", "value": "24", "enabled": false }
+        ],
+        "body": {
+          "mode": "none",
+          "content": ""
+        },
+        "auth": {
+          "type": "inherit",
+          "bearer": { "token": "" },
+          "basic": { "username": "", "password": "" },
+          "apikey": { "key": "", "value": "", "in": "header" }
+        }
+      },
+      {
+        "id": "a0000006-0000-0000-0000-000000000002",
+        "collectionId": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "folderId": "f0000001-0000-0000-0000-000000000006",
+        "sortOrder": 1,
+        "createdAt": "2026-03-18T20:00:00.000Z",
+        "updatedAt": "2026-03-18T20:00:00.000Z",
+        "name": "Metrics (Prometheus)",
+        "method": "GET",
+        "url": "http://localhost:3000/metrics",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "content": ""
+        },
+        "auth": {
+          "type": "inherit",
+          "bearer": { "token": "" },
+          "basic": { "username": "", "password": "" },
+          "apikey": { "key": "", "value": "", "in": "header" }
+        }
+      }
+    ]
+  }
+}
