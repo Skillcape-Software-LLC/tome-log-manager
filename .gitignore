@@ -4,3 +4,7 @@ backups/
 .env
 .env.local
 data/
+
+
+.claude/
+CLAUDE.MD
