@@ -43,15 +43,15 @@ async function start() {
   });
 
   // ── Routes ─────────────────────────────────────────────────────────────────
-  await fastify.register(ingestRoutes);
-  await fastify.register(queryRoutes);
-  await fastify.register(keysRoutes);
-  await fastify.register(alertsRoutes);
-  await fastify.register(dashboardRoutes);
-  await fastify.register(metricsRoutes);
+  await fastify.register(ingestRoutes,    { prefix: "/tome" });
+  await fastify.register(queryRoutes,     { prefix: "/tome" });
+  await fastify.register(keysRoutes,      { prefix: "/tome" });
+  await fastify.register(alertsRoutes,    { prefix: "/tome" });
+  await fastify.register(dashboardRoutes, { prefix: "/tome" });
+  await fastify.register(metricsRoutes,   { prefix: "/tome" });
 
   // ── Health check (unauthenticated) ─────────────────────────────────────────
-  fastify.get("/healthz", async () => {
+  fastify.get("/tome/healthz", async () => {
     // Quick DB ping
     await sql`SELECT 1`;
     return { status: "ok" };
