@@ -67,7 +67,7 @@ export async function adminAuth(request: FastifyRequest, reply: FastifyReply): P
   await resolveKey(request, reply);
   if (reply.sent) return; // resolveKey already replied with 401
 
-  if (request.keyRecord?.role !== "admin") {
+  if (!request.keyRecord || request.keyRecord.role !== "admin") {
     reply.status(403).send({ error: "Admin key required" });
   }
 }
@@ -93,7 +93,7 @@ export function validateIngestAuth(
   if (key.project_name) {
     const provided = (entryProjectName ?? "").toLowerCase();
     if (provided !== key.project_name) {
-      reply.status(401).send({ error: "Authentication failed" });
+      reply.status(401).send({ error: "Invalid or revoked API key" });
       return false;
     }
   }

@@ -1,6 +1,13 @@
+import { FastifyBaseLogger } from "fastify";
 import { sql } from "./db";
 import { evaluateRules } from "./alertEngine";
 import { IngestRecord } from "./types";
+
+let log: FastifyBaseLogger | typeof console = console;
+
+export function initBuffer(logger: FastifyBaseLogger): void {
+  log = logger;
+}
 
 let buffer: IngestRecord[] = [];
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
@@ -29,7 +36,7 @@ function triggerFlush(): void {
     flushTimer = null;
   }
   flush().catch((err) => {
-    console.error("[tome.buffer] flush error:", err);
+    log.error("[tome.buffer] flush error:", err);
   });
 }
 
@@ -57,7 +64,7 @@ async function flush(): Promise<void> {
 
     for (let i = 0; i < rows.length; i++) {
       evaluateRules(rows[i].id as string, batch[i]).catch((err) => {
-        console.error("[tome.buffer] alert engine error:", err);
+        log.error("[tome.buffer] alert engine error:", err);
       });
     }
   } catch (err) {
@@ -66,7 +73,7 @@ async function flush(): Promise<void> {
     if (buffer.length > MAX_BUFFER_SIZE) {
       const dropped = buffer.length - MAX_BUFFER_SIZE;
       buffer = buffer.slice(0, MAX_BUFFER_SIZE);
-      console.error(`[tome.buffer] dropped ${dropped} records after failed flush`);
+      log.error(`[tome.buffer] dropped ${dropped} records after failed flush`);
     }
     throw err;
   } finally {
@@ -87,10 +94,10 @@ export async function drainBuffer(): Promise<void> {
       flushing = false;
       await flush();
     } catch (err) {
-      console.error(`[tome.buffer] drain attempt ${attempt + 1} failed:`, err);
+      log.error(`[tome.buffer] drain attempt ${attempt + 1} failed:`, err);
     }
   }
   if (buffer.length > 0) {
-    console.error(`[tome.buffer] ${buffer.length} records lost on shutdown`);
+    log.error(`[tome.buffer] ${buffer.length} records lost on shutdown`);
   }
 }

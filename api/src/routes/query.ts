@@ -3,6 +3,8 @@ import { z } from "zod";
 import { sql } from "../db";
 import { keyAuth } from "../auth";
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 // ── Cursor encoding ───────────────────────────────────────────────────────────
 // Cursor encodes { ts: ISO string, id: UUID } as base64 JSON
 
@@ -12,7 +14,9 @@ function encodeCursor(timestamp: Date, id: string): string {
 
 function decodeCursor(cursor: string): { ts: string; id: string } | null {
   try {
-    return JSON.parse(Buffer.from(cursor, "base64url").toString("utf8"));
+    const parsed = JSON.parse(Buffer.from(cursor, "base64url").toString("utf8"));
+    if (!parsed.ts || !parsed.id || !UUID_RE.test(parsed.id)) return null;
+    return parsed;
   } catch {
     return null;
   }
@@ -77,7 +81,8 @@ function buildConditions(p: FilterParams): ReturnType<typeof sql>[] {
 
   // Exact substring match — use when hunting UUIDs, error codes, stack trace fragments
   if (p.message_contains) {
-    conditions.push(sql`message ILIKE ${`%${p.message_contains}%`}`);
+    const escaped = p.message_contains.replace(/[%_\\]/g, "\\$&");
+    conditions.push(sql`message ILIKE ${`%${escaped}%`} ESCAPE '\\'`);
   }
 
   // JSONB containment — uses the GIN index; values are type-aware
@@ -234,6 +239,9 @@ export async function queryRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get<{ Params: { id: string } }>("/records/:id", {
     preHandler: keyAuth,
   }, async (request, reply) => {
+    if (!UUID_RE.test(request.params.id)) {
+      return reply.status(400).send({ error: "Invalid record ID" });
+    }
     const rows = await sql`
       SELECT id, timestamp, received_at, level, collection, message, metadata
       FROM records

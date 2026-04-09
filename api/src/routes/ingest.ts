@@ -80,11 +80,9 @@ export async function ingestRoutes(fastify: FastifyInstance): Promise<void> {
       entries.push(parsed.data);
     }
 
-    // Validate auth against the first record's collection (all records share the same key)
     const key = request.keyRecord!;
-    if (!validateIngestAuth(key, entries[0].collection, entries[0].project_name, reply)) return;
-
     for (const entry of entries) {
+      if (!validateIngestAuth(key, entry.collection, entry.project_name, reply)) return;
       enqueue(entry);
     }
 

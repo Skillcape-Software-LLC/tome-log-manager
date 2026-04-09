@@ -1,4 +1,5 @@
 import Fastify from "fastify";
+import helmet from "@fastify/helmet";
 import rateLimit from "@fastify/rate-limit";
 
 import { ingestRoutes }    from "./routes/ingest";
@@ -8,7 +9,8 @@ import { alertsRoutes }    from "./routes/alerts";
 import { dashboardRoutes } from "./routes/dashboard";
 import { metricsRoutes }   from "./routes/metrics";
 import { sql }             from "./db";
-import { drainBuffer }     from "./writeBuffer";
+import { hashKey }         from "./auth";
+import { drainBuffer, initBuffer } from "./writeBuffer";
 
 const fastify = Fastify({
   logger: {
@@ -20,7 +22,13 @@ const fastify = Fastify({
 });
 
 async function start() {
+  initBuffer(fastify.log);
+
   // ── Plugins ────────────────────────────────────────────────────────────────
+  await fastify.register(helmet, {
+    contentSecurityPolicy: false, // API-only, no HTML
+  });
+
   await fastify.register(rateLimit, {
     global: true,
     max: 200,
@@ -28,8 +36,9 @@ async function start() {
     skipOnError: false,
     allowList: [],
     keyGenerator: (request) => {
-      // Rate limit per API key when present, fall back to IP for unauthenticated routes
-      return (request.headers["x-api-key"] as string) ?? request.ip;
+      // Rate limit per API key hash when present, fall back to IP for unauthenticated routes
+      const apiKey = request.headers["x-api-key"] as string;
+      return apiKey ? hashKey(apiKey) : request.ip;
     },
   });
 
@@ -54,6 +63,7 @@ async function start() {
 
     // Backpressure — write buffer full
     if (error.message === "Write buffer full") {
+      reply.header("Retry-After", "5");
       return reply.status(503).send({ error: "Write buffer full — try again shortly" });
     }
 
