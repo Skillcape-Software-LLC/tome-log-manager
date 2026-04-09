@@ -8,6 +8,7 @@ import { alertsRoutes }    from "./routes/alerts";
 import { dashboardRoutes } from "./routes/dashboard";
 import { metricsRoutes }   from "./routes/metrics";
 import { sql }             from "./db";
+import { drainBuffer }     from "./writeBuffer";
 
 const fastify = Fastify({
   logger: {
@@ -26,6 +27,10 @@ async function start() {
     timeWindow: "1 minute",
     skipOnError: false,
     allowList: [],
+    keyGenerator: (request) => {
+      // Rate limit per API key when present, fall back to IP for unauthenticated routes
+      return (request.headers["x-api-key"] as string) ?? request.ip;
+    },
   });
 
   // ── Routes ─────────────────────────────────────────────────────────────────
@@ -46,6 +51,11 @@ async function start() {
   // ── Global error handler ───────────────────────────────────────────────────
   fastify.setErrorHandler((error, _request, reply) => {
     fastify.log.error({ err: error, msg: error.message }, "request error");
+
+    // Backpressure — write buffer full
+    if (error.message === "Write buffer full") {
+      return reply.status(503).send({ error: "Write buffer full — try again shortly" });
+    }
 
     // Fastify body parsing errors (malformed JSON, body too large)
     if (error.statusCode === 413) {
@@ -68,3 +78,13 @@ async function start() {
 }
 
 start();
+
+// ── Graceful shutdown ──────────────────────────────────────────────────────
+const shutdown = async () => {
+  fastify.log.info("shutting down — draining write buffer");
+  await drainBuffer();
+  await sql.end({ timeout: 5 });
+  process.exit(0);
+};
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);

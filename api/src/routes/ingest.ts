@@ -1,8 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { sql } from "../db";
 import { keyAuth, validateIngestAuth } from "../auth";
-import { evaluateRules } from "../alertEngine";
+import { enqueue } from "../writeBuffer";
 
 // Load valid levels from env at startup — no default fallback; level is always required
 const VALID_LEVELS: Set<string> = new Set(
@@ -56,20 +55,8 @@ export async function ingestRoutes(fastify: FastifyInstance): Promise<void> {
 
     if (!validateIngestAuth(key, entry.collection, entry.project_name, reply)) return;
 
-    const [row] = await sql`
-      INSERT INTO records (timestamp, level, collection, message, metadata)
-      VALUES (${entry.timestamp}, ${entry.level}, ${entry.collection}, ${entry.message}, ${sql.json(entry.metadata as any)})
-      RETURNING id
-    `;
-
-    const recordId = row.id as string;
-
-    // Fire-and-forget alert evaluation — never blocks the response
-    evaluateRules(recordId, entry).catch((err) => {
-      fastify.log.error({ err, recordId }, "alert engine error");
-    });
-
-    return reply.status(201).send({ status: "ok", id: recordId });
+    enqueue(entry);
+    return reply.status(202).send({ status: "accepted" });
   });
 
   // POST /records/batch — batch ingest (up to 1000 records)
@@ -97,26 +84,10 @@ export async function ingestRoutes(fastify: FastifyInstance): Promise<void> {
     const key = request.keyRecord!;
     if (!validateIngestAuth(key, entries[0].collection, entries[0].project_name, reply)) return;
 
-    // Insert all records in a single transaction
-    const recordIds: string[] = [];
-    await sql.begin(async (tx: any) => {
-      for (const entry of entries) {
-        const [row] = await tx`
-          INSERT INTO records (timestamp, level, collection, message, metadata)
-          VALUES (${entry.timestamp}, ${entry.level}, ${entry.collection}, ${entry.message}, ${tx.json(entry.metadata as any)})
-          RETURNING id
-        `;
-        recordIds.push(row.id as string);
-      }
-    });
-
-    // Fire-and-forget alert evaluation for each inserted record
-    for (let i = 0; i < recordIds.length; i++) {
-      evaluateRules(recordIds[i], entries[i]).catch((err) => {
-        fastify.log.error({ err, recordId: recordIds[i] }, "alert engine error");
-      });
+    for (const entry of entries) {
+      enqueue(entry);
     }
 
-    return reply.status(201).send({ status: "ok", count: recordIds.length });
+    return reply.status(202).send({ status: "accepted", count: entries.length });
   });
 }

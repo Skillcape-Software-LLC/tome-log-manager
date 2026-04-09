@@ -6,13 +6,8 @@ if (!connectionString) {
 }
 
 export const sql = postgres(connectionString, {
-  max: 10,              // connection pool size
+  max: 25,              // connection pool size
   idle_timeout: 30,     // close idle connections after 30s
   connect_timeout: 5,   // fail fast if DB unreachable
 });
 
-// Graceful shutdown
-process.on("SIGTERM", async () => {
-  await sql.end({ timeout: 5 });
-  process.exit(0);
-});
