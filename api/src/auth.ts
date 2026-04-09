@@ -65,7 +65,7 @@ export async function keyAuth(request: FastifyRequest, reply: FastifyReply): Pro
  */
 export async function adminAuth(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   await resolveKey(request, reply);
-  if (reply.headersSent) return; // resolveKey already replied with 401
+  if (reply.sent) return; // resolveKey already replied with 401
 
   if (!request.keyRecord || request.keyRecord.role !== "admin") {
     reply.status(403).send({ error: "Admin key required" });

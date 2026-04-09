@@ -1,4 +1,4 @@
-import Fastify from "fastify";
+import Fastify, { FastifyError } from "fastify";
 import helmet from "@fastify/helmet";
 import rateLimit from "@fastify/rate-limit";
 
@@ -58,7 +58,7 @@ async function start() {
   });
 
   // ── Global error handler ───────────────────────────────────────────────────
-  fastify.setErrorHandler((error, _request, reply) => {
+  fastify.setErrorHandler((error: FastifyError, _request, reply) => {
     fastify.log.error({ err: error, msg: error.message }, "request error");
 
     // Backpressure — write buffer full
