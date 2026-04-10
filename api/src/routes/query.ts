@@ -31,12 +31,7 @@ function extractMetadataFilter(query: Record<string, string>): Record<string, un
   const filter: Record<string, unknown> = {};
   for (const [key, val] of Object.entries(query)) {
     if (key.startsWith("metadata.")) {
-      const metaKey = key.slice(9);
-      try {
-        filter[metaKey] = JSON.parse(val);
-      } catch {
-        filter[metaKey] = val;
-      }
+      filter[key.slice(9)] = val;
     }
   }
   return filter;
