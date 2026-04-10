@@ -135,22 +135,21 @@ await fetch('http://your-host:8420/records', {
 });
 ```
 
-#### Response — `201 Created`
+#### Response — `202 Accepted`
 
 ```json
 {
-  "status": "ok",
-  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+  "status": "accepted"
 }
 ```
 
-> Alert rules are evaluated asynchronously after the response is sent — ingestion is never delayed by alert processing.
+> Records are held in a server-side write buffer and flushed to Postgres in batches (up to 500 records or every 2 seconds, whichever comes first). Alert rules are evaluated after each flush — ingestion is never delayed by alert processing.
 
 ---
 
 ### POST /records/batch
 
-Ingest up to 1,000 records in a single atomic transaction. All records are committed together or not at all.
+Ingest up to 1,000 records in a single request. Records are enqueued into the server-side write buffer and flushed to Postgres in batches.
 
 **Required role:** `ingest` or `admin`
 
@@ -184,11 +183,11 @@ curl -s -X POST http://your-host:8420/records/batch \
   ]'
 ```
 
-#### Response — `201 Created`
+#### Response — `202 Accepted`
 
 ```json
 {
-  "status": "ok",
+  "status": "accepted",
   "count": 3
 }
 ```
@@ -215,7 +214,7 @@ curl -s -X POST http://your-host:8420/keys \
 
 **Buffer and batch for high-volume services**
 
-Accumulate records in memory for up to a few seconds, then flush with `/records/batch`. This reduces HTTP overhead and keeps Postgres write amplification low. Example: collect up to 500 records or flush every 2 seconds, whichever comes first.
+Tome buffers records server-side (up to 500 records or 2 seconds, whichever comes first), so even single-record `POST /records` calls are efficient for moderate volume. For very high throughput, accumulate records client-side and flush with `/records/batch` to reduce HTTP overhead.
 
 **Use `timestamp` for replaying historical data**
 

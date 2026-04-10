@@ -36,7 +36,7 @@ function triggerFlush(): void {
     flushTimer = null;
   }
   flush().catch((err) => {
-    log.error("[tome.buffer] flush error:", err);
+    log.error({ err }, "[tome.buffer] flush error");
   });
 }
 
@@ -50,15 +50,13 @@ async function flush(): Promise<void> {
   try {
     const rows = await sql`
       INSERT INTO records (timestamp, level, collection, message, metadata)
-      VALUES ${sql(
-        batch.map((e) => ({
-          timestamp: e.timestamp,
-          level: e.level,
-          collection: e.collection,
-          message: e.message,
-          metadata: sql.json(e.metadata as any),
-        }))
-      )}
+      SELECT * FROM unnest(
+        ${sql.array(batch.map((e) => e.timestamp))}::timestamptz[],
+        ${sql.array(batch.map((e) => e.level))}::text[],
+        ${sql.array(batch.map((e) => e.collection))}::text[],
+        ${sql.array(batch.map((e) => e.message))}::text[],
+        ${sql.array(batch.map((e) => JSON.stringify(e.metadata)))}::jsonb[]
+      )
       RETURNING id
     `;
 
