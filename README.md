@@ -11,7 +11,7 @@ Self-hosted log management. Ingest structured records from any application, quer
 **Prerequisites:** Docker and Docker Compose installed. `openssl` available in your shell.
 
 ```bash
-git clone https://github.com/YOUR_ORG/tome.git
+git clone https://github.com/skillcape-software-llc/tome-log-manager.git
 cd tome
 ./start.sh
 ```
@@ -251,7 +251,7 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-The workflow publishes `ghcr.io/YOUR_ORG/tome:1.0.0`, `1.0`, `1`, and `latest`.
+The workflow publishes `ghcr.io/skillcape-software-llc/tome:1.0.0`, `1.0`, `1`, and `latest`.
 
 ---
 
